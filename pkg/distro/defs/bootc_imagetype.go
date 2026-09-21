@@ -99,10 +99,10 @@ func (t *bootcImageType) BootMode() platform.BootMode {
 		return platform.BOOT_UEFI
 	}
 
-	// Sealed images don't need a BIOSBOOT partition as they don't use bootupd
-	// (which requires it to exist), let's set ourselves to UEFI
+	// Unified kernels and EFI aboot payloads boot through UEFI without bootupd,
+	// so they do not need a BIOSBOOT partition.
 	bd := t.arch.distro.(*BootcDistro)
-	if bd.unifiedKernel {
+	if bd.unifiedKernel || bd.containerType.IsAbootEFI() {
 		return platform.BOOT_UEFI
 	}
 
@@ -872,10 +872,9 @@ func (t *bootcImageType) genPartitionTable(customizations *blueprint.Customizati
 
 	bd := t.arch.distro.(*BootcDistro)
 
-	// When there's a unified kernel we don't want to auto-create a /boot even *if* the
-	// root filesystem is btrfs or lvm. Set a policy that disables the creation. Otherwise
-	// the default partition table policy is used.
-	if bd.unifiedKernel {
+	// Unified kernels and aboot payloads do not use a separate /boot, even if
+	// the root filesystem is btrfs or lvm. Otherwise use the default policy.
+	if bd.unifiedKernel || bd.containerType.IsAboot() {
 		basept.Policy = &disk.PartitionTablePolicy{
 			EnsureXBOOTLDR: false,
 		}
