@@ -23,6 +23,7 @@ type BootcDiskImage struct {
 
 	Bootloader    *string
 	UnifiedKernel bool
+	Aboot         bool
 
 	// Customizations
 	OSCustomizations   manifest.OSCustomizations
@@ -112,6 +113,7 @@ func (img *BootcDiskImage) InstantiateManifestFromContainers(m *manifest.Manifes
 	}
 	rawImage.Bootloader = img.Bootloader
 	rawImage.UnifiedKernel = img.UnifiedKernel
+	rawImage.Aboot = img.Aboot
 	rawImage.PartitionTable = img.PartitionTable
 	rawImage.OSCustomizations = img.OSCustomizations
 	rawImage.DiskCustomizations = img.DiskCustomizations
